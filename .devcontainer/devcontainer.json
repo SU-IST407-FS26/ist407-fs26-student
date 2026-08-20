@@ -1,0 +1,57 @@
+{
+  "name": "IST 407 \u2014 Machine Learning",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "forwardPorts": [
+    8888
+  ],
+  "portsAttributes": {
+    "8888": {
+      "label": "Jupyter"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "notebook.output.textLineLimit": 60,
+        "python.analysis.exclude": [
+          "**/.venv/**",
+          "**/venv/**",
+          "**/.git/**",
+          "**/node_modules/**",
+          "**/__pycache__/**"
+        ],
+        "python.analysis.indexing": true,
+        "python.analysis.userFileIndexingLimit": 2000,
+        "files.watcherExclude": {
+          "**/.venv/**": true,
+          "**/venv/**": true,
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          "**/node_modules/**": true,
+          "**/__pycache__/**": true,
+          "**/.ipynb_checkpoints/**": true
+        },
+        "search.exclude": {
+          "**/.venv": true,
+          "**/venv": true,
+          "**/__pycache__": true
+        },
+        "python.terminal.activateEnvironment": false
+      }
+    }
+  },
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "8gb"
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": "git remote add upstream https://github.com/SU-IST407-FS26/ist407-fs26-student.git 2>/dev/null || true; git config --global --add safe.directory \"$PWD\" 2>/dev/null || true; python -c \"import sklearn; print('IST407 environment OK - sklearn', sklearn.__version__)\""
+}

@@ -1,0 +1,22 @@
+{
+  // Run these from:  Command Palette (Cmd/Ctrl+Shift+P) -> "Tasks: Run Task"
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Get this week's assignment",
+      "detail": "Downloads new course materials. Commit your work first.",
+      "type": "shell",
+      "command": "bash ./update-course.sh",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Check my environment",
+      "detail": "Confirms Python and the course libraries are working.",
+      "type": "shell",
+      "command": "python -c \"import sklearn, pandas, numpy, matplotlib, seaborn; print('Environment OK - sklearn', sklearn.__version__)\"",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    }
+  ]
+}
