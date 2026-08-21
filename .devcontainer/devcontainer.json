@@ -28,7 +28,6 @@
           "**/node_modules/**",
           "**/__pycache__/**"
         ],
-        "python.analysis.indexing": false,
         "files.watcherExclude": {
           "**/.venv/**": true,
           "**/venv/**": true,
@@ -45,11 +44,10 @@
         },
         "python.terminal.activateEnvironment": false,
         "python.condaPath": "",
-        "python.useEnvironmentsExtension": false,
-        "python.analysis.languageServerMode": "light"
+        "python.useEnvironmentsExtension": false
       },
-      "_comment_python_envs": "python.useEnvironmentsExtension=false is LOAD-BEARING, not tuning. ms-python.python lists ms-python.vscode-python-envs in its extensionPack, so requesting the Python extension silently installs the Environments extension for every student. Measured 2026-08-20 in the student container: the Python extension activated it by API ('activationEvent: api, root cause: ms-python.python') and it then resolved the SAME interpreter /usr/local/bin/python 242 times in 117 seconds -- 45 of them in the 2 seconds after a second notebook was opened -- saturating the resolve queue until getActivePythonEnvironment blew its 2000ms budget and the window appeared to hang. Its package.json default is already false, so something (an experiment rollout) turns it on; setting it explicitly pins it off. Requires a window reload to take effect. Extension hosts in the same container with it inactive: zero timeouts, two notebooks clean.",
-      "_comment_pylance": "languageServerMode=light: Pylance was isolated 2026-08-20 as the cause of the second-notebook stall (disable Pylance -> stall gone; re-enable -> stall returns; downgrading one version did not help). Signature: the remote extension host went unresponsive in 40s-of-every-60s episodes, all recovering on a 60s tick phase-locked to extension-host start, while the container sat idle (load 0.19, no blocked I/O) and both notebook kernels started fine -- i.e. the host was blocked on its language server, not computing. 'light' drops workspace-wide indexing and cross-file symbol search, which buy little in a 126-file teaching repo, and keeps the completions and hover on pandas/numpy/sklearn that students actually use. NOTE python.analysis.indexing was still true in the deployed template during every repro, so indexing had never actually been off. If light is insufficient, next steps in order: python.analysis.nodeExecutable (Pylance otherwise runs its server on the Node bundled with VS Code, the known dev-container failure mode), then python.languageServer=Jedi, then disable Pylance."
+      "_comment_python_envs": "python.useEnvironmentsExtension=false removes genuine waste, kept purely as an efficiency fix. ms-python.python lists ms-python.vscode-python-envs in its extensionPack, so every student gets the Environments extension; measured 2026-08-20 it resolved the SAME interpreter /usr/local/bin/python 242 times in 117 seconds. Setting this false stops that churn (its package.json default is already false; an experiment rollout flips it on). Requires a window reload. NOTE: this setting was once suspected of causing the second-notebook hang -- it did NOT. See _comment_stall.",
+      "_comment_stall": "The 'second-notebook stall' (a cell spins forever on 'Connecting to kernel') was root-caused 2026-08-21 to ipykernel 7.x deadlocking the VS Code Jupyter extension's kernel-startup handshake on the 2nd/3rd kernel. FIX: ipykernel is pinned <7 in requirements.txt. The kernel is healthy underneath (it answers kernel_info from a plain jupyter_client); only VS Code's registration hangs. Days were lost wrongly blaming Pylance -- disabling Pylance only appeared to fix it because the stall is intermittent (the eslint/autopep8 confound all over again). Pylance, Copilot, DNS, filesystem, and python.analysis.nodeExecutable were ALL falsified by measurement. Do NOT re-add languageServerMode:light or python.analysis.indexing:false as 'stall mitigations' -- they aimed at the wrong target and only degrade IntelliSense on a 126-file repo where full Pylance is fine."
     }
   },
   "hostRequirements": {

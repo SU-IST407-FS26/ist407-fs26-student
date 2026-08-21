@@ -23,7 +23,15 @@ scikit-learn>=1.5,<2
 
 # --- Notebook tooling ---
 jupyter
-ipykernel
+# ipykernel is PINNED BELOW 7.0 for Fall 2026. ipykernel 7.x (a major async rewrite)
+# deadlocks the VS Code Jupyter extension's kernel-startup handshake when a 2nd/3rd
+# notebook kernel is started: the kernel itself comes up healthy (it answers a
+# kernel_info request from a plain jupyter_client) but VS Code never registers it as
+# "successfully started", so the cell spins on "Connecting to kernel" forever.
+# Root-caused 2026-08-21 after a long hunt that wrongly blamed Pylance. 6.29.5 is the
+# last 6.x and the series VS Code has years of stability against. Revisit once the
+# Jupyter extension officially supports ipykernel 7.x.
+ipykernel>=6.29,<7
 
 # --- Later-week extras ---
 xgboost>=2.0          # week 10 lab (decision trees)
